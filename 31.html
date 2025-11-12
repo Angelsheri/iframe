@@ -5,6 +5,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Brendan Sheppard - Business Analyst</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://res.cloudinary.com/textac/image/upload/v1761530606/favicon_sxjm5l.png">
 
     <style>
         /* ---- Base / Reset ---- */
@@ -66,17 +69,15 @@
             justify-content: space-between;
             padding: 16px 24px;
             z-index: 1000;
-            transition: backdrop-filter .3s ease, background-color .3s ease;
-        }
-
-        .header.scrolled {
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            background: rgba(255, 255, 255, .7);
+            background: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
         }
 
-        [data-theme="dark"] .header.scrolled {
-            background: rgba(15, 15, 15, .7);
+        [data-theme="dark"] .header {
+            background: rgba(15, 15, 15, 0.9);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .header-left {
@@ -208,6 +209,7 @@
         .logo-section-header {
             text-align: center;
             margin: 24px 0 16px;
+            width: 100%;
         }
 
         .logo-section-header h2 {
@@ -599,7 +601,7 @@
 </head>
 
 <body>
-    <!-- Fixed Header -->
+    <!-- Fixed Header - ALWAYS OPAQUE -->
     <header class="header" id="header">
         <div class="header-left">
             <!-- Theme switcher on left side -->
@@ -635,7 +637,8 @@
     <main>
         <section class="hero-section">
             <div class="container">
-                <img src="https://res.cloudinary.com/ddo2giwfv/image/upload/v1761572854/Headshot_white_tn3o7u.png"
+                <!-- UPDATED AVATAR URL -->
+                <img src="https://res.cloudinary.com/textac/image/upload/v1761572854/Headshot_white_tn3o7u.png"
                     alt="Brendan Sheppard" class="avatar" id="avatar-img" />
                 <h1 class="h1">Brendan Sheppard</h1>
                 <p  class="bio p">
@@ -644,61 +647,63 @@
                     leading organisations in the private and government sectors.
                 </p>
 
-                
-               
+                <!-- Logo Heading -->
+                <div class="logo-section-header">
+                    <h2>Companies I've worked with</h2>
+                </div>
                 
                 <section aria-label="Companies I've worked with" class="logo-strip">
                     <div class="marquee">
                         <div class="marquee-inner">
-                            <!-- Track 1 -->
-                            <img src="https://res.cloudinary.com/ddo2giwfv/image/upload/v1761531976/allianz-black_fhzl8z.svg"
+                            <!-- Track 1 - UPDATED LOGO LINKS -->
+                            <img src="https://res.cloudinary.com/textac/image/upload/v1761531976/allianz-black_fhzl8z.svg"
                                 alt="Allianz" class="logo-mono" style="height:var(--logo-h);width:auto;object-fit:contain"
                                 loading="lazy" />
-                            <img src="https://res.cloudinary.com/ddo2giwfv/image/upload/v1761532578/budget-direct-black_boldgt.svg"
+                            <img src="https://res.cloudinary.com/textac/image/upload/v1761532578/budget-direct-black_boldgt.svg"
                                 alt="Budget Direct" class="logo-mono"
                                 style="height:var(--logo-h);width:auto;object-fit:contain" loading="lazy" />
-                            <img src="https://res.cloudinary.com/ddo2giwfv/image/upload/v1761532579/fc-black_cxbh7a.svg"
+                            <img src="https://res.cloudinary.com/textac/image/upload/v1761532579/fc-black_cxbh7a.svg"
                                 alt="Flight Centre" class="logo-mono"
                                 style="height:var(--logo-h);width:auto;object-fit:contain" loading="lazy" />
-                            <img src="https://res.cloudinary.com/ddo2giwfv/image/upload/v1761540650/fcm-black_yafwon.svg"
+                            <img src="https://res.cloudinary.com/textac/image/upload/v1761540650/fcm-black_yafwon.svg"
                                 alt="FCM" class="logo-mono" style="height:var(--logo-h);width:auto;object-fit:contain"
                                 loading="lazy" />
-                            <img src="https://res.cloudinary.com/ddo2giwfv/image/upload/v1761532580/liquid-black_l8fhgy.svg"
+                            <img src="https://res.cloudinary.com/textac/image/upload/v1761532580/liquid-black_l8fhgy.svg"
                                 alt="Liquid Interactive" class="logo-mono"
                                 style="height:var(--logo-h);width:auto;object-fit:contain" loading="lazy" />
-                            <img src="https://res.cloudinary.com/ddo2giwfv/image/upload/v1761532580/pfb-black_d1qsug.svg"
+                            <img src="https://res.cloudinary.com/textac/image/upload/v1761532580/pfb-black_d1qsug.svg"
                                 alt="People First Bank" class="logo-mono"
                                 style="height:var(--logo-h);width:auto;object-fit:contain" loading="lazy" />
-                            <img src="https://res.cloudinary.com/ddo2giwfv/image/upload/v1761543598/qut-black-trimmed_tv8d7l.svg"
-                                alt="QUT" style="height:calc(var(--logo-h) * 1.4);width:auto;object-fit:contain"
+                            <img src="https://res.cloudinary.com/textac/image/upload/v1761635193/qut-black-trimmed_tv8d7l.svg"
+                                alt="QUT" class="logo-mono" style="height:var(--logo-h);width:auto;object-fit:contain"
                                 loading="lazy" />
-                            <img src="https://res.cloudinary.com/ddo2giwfv/image/upload/v1761531951/qbcc-black_f9dvaw.svg"
+                            <img src="https://res.cloudinary.com/textac/image/upload/v1761531951/qbcc-black_f9dvaw.svg"
                                 alt="QBCC" class="logo-mono" style="height:var(--logo-h);width:auto;object-fit:contain"
                                 loading="lazy" />
 
-                            <!-- Track 2 duplicate -->
-                            <img src="https://res.cloudinary.com/ddo2giwfv/image/upload/v1761531976/allianz-black_fhzl8z.svg"
+                            <!-- Track 2 duplicate - UPDATED LOGO LINKS -->
+                            <img src="https://res.cloudinary.com/textac/image/upload/v1761531976/allianz-black_fhzl8z.svg"
                                 alt="" aria-hidden="true" class="logo-mono"
                                 style="height:var(--logo-h);width:auto;object-fit:contain" loading="lazy" />
-                            <img src="https://res.cloudinary.com/ddo2giwfv/image/upload/v1761532578/budget-direct-black_boldgt.svg"
+                            <img src="https://res.cloudinary.com/textac/image/upload/v1761532578/budget-direct-black_boldgt.svg"
                                 alt="" aria-hidden="true" class="logo-mono"
                                 style="height:var(--logo-h);width:auto;object-fit:contain" loading="lazy" />
-                            <img src="https://res.cloudinary.com/ddo2giwfv/image/upload/v1761532579/fc-black_cxbh7a.svg"
+                            <img src="https://res.cloudinary.com/textac/image/upload/v1761532579/fc-black_cxbh7a.svg"
                                 alt="" aria-hidden="true" class="logo-mono"
                                 style="height:var(--logo-h);width:auto;object-fit:contain" loading="lazy" />
-                            <img src="https://res.cloudinary.com/ddo2giwfv/image/upload/v1761540650/fcm-black_yafwon.svg"
+                            <img src="https://res.cloudinary.com/textac/image/upload/v1761540650/fcm-black_yafwon.svg"
                                 alt="" aria-hidden="true" class="logo-mono"
                                 style="height:var(--logo-h);width:auto;object-fit:contain" loading="lazy" />
-                            <img src="https://res.cloudinary.com/ddo2giwfv/image/upload/v1761532580/liquid-black_l8fhgy.svg"
+                            <img src="https://res.cloudinary.com/textac/image/upload/v1761532580/liquid-black_l8fhgy.svg"
                                 alt="" aria-hidden="true" class="logo-mono"
                                 style="height:var(--logo-h);width:auto;object-fit:contain" loading="lazy" />
-                            <img src="https://res.cloudinary.com/ddo2giwfv/image/upload/v1761532580/pfb-black_d1qsug.svg"
+                            <img src="https://res.cloudinary.com/textac/image/upload/v1761532580/pfb-black_d1qsug.svg"
                                 alt="" aria-hidden="true" class="logo-mono"
                                 style="height:var(--logo-h);width:auto;object-fit:contain" loading="lazy" />
-                            <img src="https://res.cloudinary.com/ddo2giwfv/image/upload/v1761543598/qut-black-trimmed_tv8d7l.svg"
-                                alt="" aria-hidden="true"
-                                style="height:calc(var(--logo-h) * 1.4);width:auto;object-fit:contain" loading="lazy" />
-                            <img src="https://res.cloudinary.com/ddo2giwfv/image/upload/v1761531951/qbcc-black_f9dvaw.svg"
+                            <img src="https://res.cloudinary.com/textac/image/upload/v1761635193/qut-black-trimmed_tv8d7l.svg"
+                                alt="" aria-hidden="true" class="logo-mono"
+                                style="height:var(--logo-h);width:auto;object-fit:contain" loading="lazy" />
+                            <img src="https://res.cloudinary.com/textac/image/upload/v1761531951/qbcc-black_f9dvaw.svg"
                                 alt="" aria-hidden="true" class="logo-mono"
                                 style="height:var(--logo-h);width:auto;object-fit:contain" loading="lazy" />
                         </div>
@@ -718,12 +723,11 @@
 
             <div class="timeline">
                 
-                <!-- Each item has a dedicated .t-pin and logo -->
+                <!-- Timeline items with UPDATED LOGO LINKS -->
                 <article class="t-item">
                     <span class="t-pin" aria-hidden="true"></span>
-                    <p class="t-company">
-                        Allianz Partners
-                    </p>
+                    <img src="https://res.cloudinary.com/textac/image/upload/v1761531976/allianz-black_fhzl8z.svg"
+                         alt="Allianz Partners" class="t-company-logo logo-mono" />
                     <p class="t-role">Business Analyst</p>
                     <p class="t-dur">Jul 2022 – Present · 2+ years</p>
                     <p>Focusing on user journey optimisation and experience design in the insurance sector.</p>
@@ -731,9 +735,8 @@
 
                 <article class="t-item">
                     <span class="t-pin" aria-hidden="true"></span>
-                    <p class="t-company">
-                        Liquid Interactive
-                    </p>
+                    <img src="https://res.cloudinary.com/textac/image/upload/v1761532580/liquid-black_l8fhgy.svg"
+                         alt="Liquid Interactive" class="t-company-logo logo-mono" />
                     <p class="t-role">Senior Business Analyst</p>
                     <p class="t-dur">May 2021 – Jun 2022 · 1 yr 2 mos</p>
                     <p>Led agile delivery projects with emphasis on customer experience and process improvement.</p>
@@ -741,9 +744,8 @@
 
                 <article class="t-item">
                     <span class="t-pin" aria-hidden="true"></span>
-                    <p class="t-company">
-                        People First Bank
-                    </p>
+                    <img src="https://res.cloudinary.com/textac/image/upload/v1761532580/pfb-black_d1qsug.svg"
+                         alt="People First Bank" class="t-company-logo logo-mono" />
                     <p class="t-role">Senior Business Analyst</p>
                     <p class="t-dur">Mar 2022 – Jun 2022 · 4 mos</p>
                     <p>Supported merger program unifying members and systems across the new organisation.</p>
@@ -751,9 +753,8 @@
 
                 <article class="t-item">
                     <span class="t-pin" aria-hidden="true"></span>
-                    <p class="t-company">
-                        QBCC
-                    </p>
+                    <img src="https://res.cloudinary.com/textac/image/upload/v1761531951/qbcc-black_f9dvaw.svg"
+                         alt="QBCC" class="t-company-logo logo-mono" />
                     <p class="t-role">Senior Business Analyst</p>
                     <p class="t-dur">Aug 2019 – Feb 2020 · 7 mos</p>
                     <p>Business process modelling and regulatory systems analysis.</p>
@@ -761,9 +762,8 @@
 
                 <article class="t-item">
                     <span class="t-pin" aria-hidden="true"></span>
-                    <p class="t-company">
-                        QUT
-                    </p>
+                    <img src="https://res.cloudinary.com/textac/image/upload/v1761635193/qut-black-trimmed_tv8d7l.svg"
+                         alt="QUT" class="t-company-logo logo-mono" />
                     <p class="t-role">Senior Business Analyst</p>
                     <p class="t-dur">Mar 2018 – Nov 2018 · 9 mos</p>
                     <p>Improved learner and partner engagement systems.</p>
@@ -771,9 +771,8 @@
 
                 <article class="t-item">
                     <span class="t-pin" aria-hidden="true"></span>
-                    <p class="t-company">
-                        Budget Direct
-                    </p>
+                    <img src="https://res.cloudinary.com/textac/image/upload/v1761532578/budget-direct-black_boldgt.svg"
+                         alt="Budget Direct" class="t-company-logo logo-mono" />
                     <p class="t-role">Senior Business Analyst</p>
                     <p class="t-dur">Nov 2017 – Feb 2018 · 4 mos</p>
                     <p>Optimised BAU sales & service processes for insurance operations.</p>
@@ -781,9 +780,8 @@
 
                 <article class="t-item">
                     <span class="t-pin" aria-hidden="true"></span>
-                    <p class="t-company">
-                        Flight Centre Travel Group
-                    </p>
+                    <img src="https://res.cloudinary.com/textac/image/upload/v1761532579/fc-black_cxbh7a.svg"
+                         alt="Flight Centre Travel Group" class="t-company-logo logo-mono" />
                     <p class="t-role">Business Analyst</p>
                     <p class="t-dur">2013 – 2017 · 4 years</p>
                     <p>Led financial system migrations and infrastructure projects globally.</p>
@@ -791,9 +789,8 @@
 
                 <article class="t-item">
                     <span class="t-pin" aria-hidden="true"></span>
-                    <p class="t-company">
-                        FCM Travel Solutions
-                    </p>
+                    <img src="https://res.cloudinary.com/textac/image/upload/v1761540650/fcm-black_yafwon.svg"
+                         alt="FCM Travel Solutions" class="t-company-logo logo-mono" />
                     <p class="t-role">Business Analyst / Team Leader</p>
                     <p class="t-dur">2009 – 2012 · 3 years</p>
                     <p>Managed BA team and drove continuous improvement for corporate travel solutions.</p>
@@ -815,7 +812,6 @@
             monitor: '<rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>'
         };
         const html = document.documentElement;
-        const header = document.getElementById('header');
         const themeToggle = document.getElementById('theme-toggle');
         const themeIcon = document.getElementById('theme-icon');
         const scrollIndicator = document.getElementById('scroll-indicator');
@@ -842,22 +838,16 @@
         });
         applyTheme(localStorage.getItem('theme') || 'system');
 
-        // Header blur toggle and chevron visibility
+        // Chevron visibility functionality only
         window.addEventListener('scroll', () => {
-            const y = window.pageYOffset || document.documentElement.scrollTop;
-            if (y > 50) header.classList.add('scrolled'); else header.classList.remove('scrolled');
-
-            // Arrow scroll indicator functionality
             if (scrollIndicator) {
                 const scrollY = window.pageYOffset || document.documentElement.scrollTop;
                 const heroSection = document.querySelector('.hero-section');
-                const hidePoint = heroSection ? heroSection.offsetHeight * 0.3 : 300; // Hide after 30% of hero section
+                const hidePoint = heroSection ? heroSection.offsetHeight * 0.3 : 300;
                 
                 if (scrollY < hidePoint) {
-                    // Show arrow - user is at top
                     scrollIndicator.classList.remove('hidden');
                 } else {
-                    // Hide arrow - user is in content
                     scrollIndicator.classList.add('hidden');
                 }
             }
@@ -872,5 +862,3 @@
 </body>
 
 </html>
-
-
