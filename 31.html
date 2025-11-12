@@ -18,10 +18,9 @@
         }
 
         html {
-            scroll-snap-type: y mandatory;
-            scroll-behavior: smooth;
-            overflow-y: scroll;
-        }
+    scroll-behavior: smooth;
+    overflow-y: auto;
+}
 
         html,
         body {
@@ -160,8 +159,11 @@
             align-items: center;
             padding: calc(var(--header-h) + 8px) 40px 40px;
             position: relative;
+            min-height: 100vh;
             height: 100vh;
             overflow: hidden;
+            height: 100vh;
+            scroll-snap-align: start;
         }
 
         .container {
@@ -391,7 +393,7 @@
         .timeline {
             max-width: var(--container-w);
             margin: 0 auto;
-            padding: 0px 40px 60px 40px;
+            padding: 120px 40px 60px 40px;
             position: relative;
             overflow: hidden;
         }
@@ -400,7 +402,7 @@
             content: '';
             position: absolute;
             left: calc(40px + 36px);
-            top: calc(0px + 34.56px);
+            top: calc(120px + 34.56px);
             bottom: 60px;
             width: 2px;
             background: linear-gradient(180deg, rgba(0, 225, 129, 0.3), var(--accent));
@@ -493,8 +495,9 @@
         /* ---- Responsive ---- */
         @media (max-width:768px) {
             .hero-section {
-                padding: calc(var(--header-h) + 20px) 24px 0px;
-                height: 600px;
+                padding: calc(var(--header-h) + 20px) 24px 40px;
+                height: 100vh;
+                min-height: 100vh;
             }
 
             .timeline-header .inner {
@@ -502,12 +505,12 @@
             }
 
             .timeline {
-                padding: 0px 24px 60px 24px;
+                padding: 120px 24px 60px 24px;
             }
 
             .timeline::before {
                 left: calc(24px + 36px);
-                top: calc(0px + 34.56px);
+                top: calc(120px + 34.56px);
             }
 
             .t-item {
@@ -559,7 +562,7 @@
             }
             
             .hero-section {
-                padding: calc(var(--header-h) + 20px) 16px 0px;
+                padding: calc(var(--header-h) + 20px) 16px 40px;
             }
         }
         
@@ -867,6 +870,220 @@
         // Ensure page loads at the top
         window.scrollTo(0, 0);
     </script>
+
+    <!-- Hero Section Snap Scroll -->
+    <script>
+/* Robust chained snap:
+   - Down from hero -> snap to experience
+   - Up while timeline scrolled -> scroll experience to its top, then immediately snap back to hero
+   - Up when at experience top -> snap back to hero
+   - Accumulates small wheel/touch inputs for reliable detection
+*/
+(function () {
+  const hero = document.querySelector('.hero-section');
+  const exp = document.getElementById('experience');
+  const header = document.getElementById('header');
+  if (!hero || !exp || !header) return;
+
+  // tuning
+  const LOCK_MS = 700;
+  const WHEEL_TIMEOUT = 160;
+  const WHEEL_THRESHOLD = 80; // px-equivalent accumulated delta required
+  const TOUCH_THRESHOLD = 36;
+  const AT_TOP_MARGIN = 32;   // px tolerance for "at top"
+
+  let lock = false;
+  function setLock() { lock = true; setTimeout(() => (lock = false), LOCK_MS); }
+
+  // accumulators
+  let wheelSum = 0, wheelTimer = null;
+  let touchStartY = 0, touchAccum = 0, touchActive = false;
+
+  // chain state: indicates we are bringing experience to top and should then snap to hero
+  let pendingChain = false;
+  let pendingChainCleanup = null;
+
+  function headerHeight() { return header.getBoundingClientRect().height || 0; }
+  function heroRect() { return hero.getBoundingClientRect(); }
+  function expRect() { return exp.getBoundingClientRect(); }
+
+  function isMostlyInHero() {
+    const hr = heroRect();
+    return hr.bottom > window.innerHeight * 0.35; // still a big chunk of hero visible
+  }
+  function expTopRelative() {
+    return expRect().top - headerHeight(); // 0 => exactly below header
+  }
+  function isAtExperienceTop() {
+    return Math.abs(expTopRelative()) <= AT_TOP_MARGIN;
+  }
+  function isExperienceScrolledDown() {
+    return expTopRelative() < -AT_TOP_MARGIN; // top scrolled above header position => inside timeline
+  }
+
+  function normalizeDelta(e) {
+    let d = e.deltaY;
+    if (e.deltaMode === 1) d *= 16;
+    else if (e.deltaMode === 2) d *= window.innerHeight;
+    return d;
+  }
+
+  function smoothToPosition(pos) {
+    if (lock) return;
+    setLock();
+    window.scrollTo({ top: pos, behavior: 'smooth' });
+  }
+  function scrollExpToTop(cb) {
+    // scroll so exp top sits just below header
+    const target = exp.offsetTop - headerHeight();
+    pendingChain = !!cb;
+    if (pendingChain && pendingChainCleanup) clearTimeout(pendingChainCleanup);
+    // add a scroll listener that will detect when exp top reaches target (within tolerance)
+    const onScrollCheck = () => {
+      if (Math.abs(exp.offsetTop - headerHeight() - window.scrollY) <= AT_TOP_MARGIN || isAtExperienceTop()) {
+        // we've reached top-ish
+        window.removeEventListener('scroll', onScrollCheck);
+        // small timeout to allow browser smooth to settle
+        setTimeout(() => {
+          if (typeof cb === 'function') cb();
+          pendingChain = false;
+        }, 60);
+      }
+    };
+    window.addEventListener('scroll', onScrollCheck, { passive: true });
+    // call smooth scroll
+    smoothToPosition(target);
+    // safety cleanup in case scrollend not detected
+    pendingChainCleanup = setTimeout(() => {
+      try { window.removeEventListener('scroll', onScrollCheck); } catch (e) {}
+      if (pendingChain && typeof cb === 'function') cb();
+      pendingChain = false;
+    }, 1400);
+  }
+
+  function snapToHero() {
+    // hero top is 0
+    if (lock) return;
+    setLock();
+    hero.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  function snapToExperience() {
+    if (lock) return;
+    setLock();
+    exp.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // WHEEL handler: accumulate, then decide
+  document.addEventListener('wheel', (e) => {
+    if (lock) return;
+    const d = normalizeDelta(e);
+    wheelSum += d;
+    clearTimeout(wheelTimer);
+    wheelTimer = setTimeout(() => (wheelSum = 0), WHEEL_TIMEOUT);
+
+    // DOWN: from hero -> snap down
+    if (wheelSum > WHEEL_THRESHOLD && isMostlyInHero()) {
+      e.preventDefault();
+      wheelSum = 0;
+      snapToExperience();
+      return;
+    }
+
+    // UP: accumulated upward motion
+    if (wheelSum < -WHEEL_THRESHOLD) {
+      // If timeline is scrolled down, bring it to top then chain snap to hero
+      if (isExperienceScrolledDown()) {
+        e.preventDefault();
+        wheelSum = 0;
+        // chain: scroll experience top then immediately snap to hero
+        scrollExpToTop(() => {
+          // call snapToHero only if user still intends to go up (we already know there was upward intent)
+          snapToHero();
+        });
+        return;
+      }
+      // If already at experience top -> snap back
+      if (isAtExperienceTop()) {
+        e.preventDefault();
+        wheelSum = 0;
+        snapToHero();
+        return;
+      }
+      // otherwise allow normal scroll
+    }
+  }, { passive: false });
+
+  // TOUCH handlers: same idea as wheel, but with moves
+  document.addEventListener('touchstart', (e) => {
+    touchActive = true;
+    touchStartY = e.touches && e.touches[0] ? e.touches[0].clientY : 0;
+    touchAccum = 0;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    if (!touchActive || lock) return;
+    const y = e.touches && e.touches[0] ? e.touches[0].clientY : 0;
+    const dy = touchStartY - y; // positive => swipe up (intent to go down)
+    touchAccum = touchAccum * 0.6 + dy;
+    touchStartY = y;
+
+    // Swipe up while hero visible -> down to experience
+    if (touchAccum > TOUCH_THRESHOLD && isMostlyInHero()) {
+      e.preventDefault();
+      touchActive = false;
+      touchAccum = 0;
+      snapToExperience();
+      return;
+    }
+
+    // Swipe down while inside timeline -> chain (bring exp to top then snap up)
+    if (touchAccum < -TOUCH_THRESHOLD) {
+      if (isExperienceScrolledDown()) {
+        e.preventDefault();
+        touchActive = false;
+        touchAccum = 0;
+        scrollExpToTop(() => snapToHero());
+        return;
+      } else if (isAtExperienceTop()) {
+        e.preventDefault();
+        touchActive = false;
+        touchAccum = 0;
+        snapToHero();
+        return;
+      }
+    }
+  }, { passive: false });
+
+  document.addEventListener('touchend', () => {
+    touchActive = false;
+    touchAccum = 0;
+  }, { passive: true });
+
+  // KEYBOARD
+  document.addEventListener('keydown', (e) => {
+    if (lock) return;
+    const k = e.key;
+    const downKeys = ['ArrowDown', 'PageDown', ' '];
+    const upKeys = ['ArrowUp', 'PageUp'];
+    if (downKeys.includes(k) && isMostlyInHero()) {
+      e.preventDefault();
+      snapToExperience();
+    } else if (upKeys.includes(k)) {
+      if (isExperienceScrolledDown()) {
+        e.preventDefault();
+        scrollExpToTop(() => snapToHero());
+      } else if (isAtExperienceTop()) {
+        e.preventDefault();
+        snapToHero();
+      }
+    }
+  });
+
+  // Optional debug helper:
+  // window._snap_state = () => ({ hero: heroRect(), exp: expRect(), header: headerHeight(), mostlyHero: isMostlyInHero(), atExpTop: isAtExperienceTop(), expScrolled: isExperienceScrolledDown(), pendingChain });
+})();
+</script>
+
 </body>
 
 </html>
