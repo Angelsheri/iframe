@@ -18,9 +18,9 @@
         }
 
         html {
-    scroll-behavior: smooth;
-    overflow-y: auto;
-}
+            scroll-behavior: smooth;
+            overflow-y: auto;
+        }
 
         html,
         body {
@@ -56,6 +56,10 @@
         .snap-section {
             min-height: 100vh;
             scroll-snap-align: start;
+        }
+
+        .scroll-indicator-container {
+            display: none !important;
         }
 
         /* ---- Fixed Header ---- */
@@ -159,7 +163,6 @@
             align-items: center;
             padding: calc(var(--header-h) + 8px) 40px 40px;
             position: relative;
-            min-height: 100vh;
             height: 100vh;
             overflow: hidden;
             height: 100vh;
@@ -611,6 +614,20 @@
             filter: black !important;
         }
 
+        @media (max-height: 550px) {
+            .hero-section {
+                height: 400px;
+                margin-top: 65px;
+            }
+            .avatar {
+                width: 100px;
+                height: 100px;
+                margin-top: 20px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+        }
     </style>
 </head>
 
@@ -872,13 +889,8 @@
     </script>
 
     <!-- Hero Section Snap Scroll -->
-    <script>
-/* Robust chained snap:
-   - Down from hero -> snap to experience
-   - Up while timeline scrolled -> scroll experience to its top, then immediately snap back to hero
-   - Up when at experience top -> snap back to hero
-   - Accumulates small wheel/touch inputs for reliable detection
-*/
+<!-- Hero-only Snap Scroll (replace your existing hero snap script with this) -->
+<script>
 (function () {
   const hero = document.querySelector('.hero-section');
   const exp = document.getElementById('experience');
@@ -890,7 +902,6 @@
   const WHEEL_TIMEOUT = 160;
   const WHEEL_THRESHOLD = 80; // px-equivalent accumulated delta required
   const TOUCH_THRESHOLD = 36;
-  const AT_TOP_MARGIN = 32;   // px tolerance for "at top"
 
   let lock = false;
   function setLock() { lock = true; setTimeout(() => (lock = false), LOCK_MS); }
@@ -898,28 +909,6 @@
   // accumulators
   let wheelSum = 0, wheelTimer = null;
   let touchStartY = 0, touchAccum = 0, touchActive = false;
-
-  // chain state: indicates we are bringing experience to top and should then snap to hero
-  let pendingChain = false;
-  let pendingChainCleanup = null;
-
-  function headerHeight() { return header.getBoundingClientRect().height || 0; }
-  function heroRect() { return hero.getBoundingClientRect(); }
-  function expRect() { return exp.getBoundingClientRect(); }
-
-  function isMostlyInHero() {
-    const hr = heroRect();
-    return hr.bottom > window.innerHeight * 0.35; // still a big chunk of hero visible
-  }
-  function expTopRelative() {
-    return expRect().top - headerHeight(); // 0 => exactly below header
-  }
-  function isAtExperienceTop() {
-    return Math.abs(expTopRelative()) <= AT_TOP_MARGIN;
-  }
-  function isExperienceScrolledDown() {
-    return expTopRelative() < -AT_TOP_MARGIN; // top scrolled above header position => inside timeline
-  }
 
   function normalizeDelta(e) {
     let d = e.deltaY;
@@ -933,156 +922,79 @@
     setLock();
     window.scrollTo({ top: pos, behavior: 'smooth' });
   }
-  function scrollExpToTop(cb) {
-    // scroll so exp top sits just below header
-    const target = exp.offsetTop - headerHeight();
-    pendingChain = !!cb;
-    if (pendingChain && pendingChainCleanup) clearTimeout(pendingChainCleanup);
-    // add a scroll listener that will detect when exp top reaches target (within tolerance)
-    const onScrollCheck = () => {
-      if (Math.abs(exp.offsetTop - headerHeight() - window.scrollY) <= AT_TOP_MARGIN || isAtExperienceTop()) {
-        // we've reached top-ish
-        window.removeEventListener('scroll', onScrollCheck);
-        // small timeout to allow browser smooth to settle
-        setTimeout(() => {
-          if (typeof cb === 'function') cb();
-          pendingChain = false;
-        }, 60);
-      }
-    };
-    window.addEventListener('scroll', onScrollCheck, { passive: true });
-    // call smooth scroll
-    smoothToPosition(target);
-    // safety cleanup in case scrollend not detected
-    pendingChainCleanup = setTimeout(() => {
-      try { window.removeEventListener('scroll', onScrollCheck); } catch (e) {}
-      if (pendingChain && typeof cb === 'function') cb();
-      pendingChain = false;
-    }, 1400);
-  }
 
-  function snapToHero() {
-    // hero top is 0
-    if (lock) return;
-    setLock();
-    hero.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
   function snapToExperience() {
     if (lock) return;
     setLock();
     exp.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  // WHEEL handler: accumulate, then decide
-  document.addEventListener('wheel', (e) => {
+  // --- WHEEL: only while pointer is over the hero element ---
+  hero.addEventListener('wheel', (e) => {
     if (lock) return;
+    // Accumulate wheel deltas only for wheel events originated in hero
     const d = normalizeDelta(e);
     wheelSum += d;
     clearTimeout(wheelTimer);
     wheelTimer = setTimeout(() => (wheelSum = 0), WHEEL_TIMEOUT);
 
-    // DOWN: from hero -> snap down
-    if (wheelSum > WHEEL_THRESHOLD && isMostlyInHero()) {
+    // DOWN: large downward intent -> snap to experience
+    if (wheelSum > WHEEL_THRESHOLD) {
       e.preventDefault();
       wheelSum = 0;
       snapToExperience();
       return;
     }
-
-    // UP: accumulated upward motion
-    if (wheelSum < -WHEEL_THRESHOLD) {
-      // If timeline is scrolled down, bring it to top then chain snap to hero
-      if (isExperienceScrolledDown()) {
-        e.preventDefault();
-        wheelSum = 0;
-        // chain: scroll experience top then immediately snap to hero
-        scrollExpToTop(() => {
-          // call snapToHero only if user still intends to go up (we already know there was upward intent)
-          snapToHero();
-        });
-        return;
-      }
-      // If already at experience top -> snap back
-      if (isAtExperienceTop()) {
-        e.preventDefault();
-        wheelSum = 0;
-        snapToHero();
-        return;
-      }
-      // otherwise allow normal scroll
-    }
+    // NOTE: We deliberately do NOT handle strong upward wheel here.
+    // This keeps all "snap" behavior constrained to hero only.
   }, { passive: false });
 
-  // TOUCH handlers: same idea as wheel, but with moves
-  document.addEventListener('touchstart', (e) => {
+  // --- TOUCH: only when touches start on hero ---
+  hero.addEventListener('touchstart', (e) => {
     touchActive = true;
     touchStartY = e.touches && e.touches[0] ? e.touches[0].clientY : 0;
     touchAccum = 0;
   }, { passive: true });
 
-  document.addEventListener('touchmove', (e) => {
+  hero.addEventListener('touchmove', (e) => {
     if (!touchActive || lock) return;
     const y = e.touches && e.touches[0] ? e.touches[0].clientY : 0;
     const dy = touchStartY - y; // positive => swipe up (intent to go down)
     touchAccum = touchAccum * 0.6 + dy;
     touchStartY = y;
 
-    // Swipe up while hero visible -> down to experience
-    if (touchAccum > TOUCH_THRESHOLD && isMostlyInHero()) {
+    // Swipe up while touching hero -> go to experience
+    if (touchAccum > TOUCH_THRESHOLD) {
       e.preventDefault();
       touchActive = false;
       touchAccum = 0;
       snapToExperience();
       return;
     }
-
-    // Swipe down while inside timeline -> chain (bring exp to top then snap up)
-    if (touchAccum < -TOUCH_THRESHOLD) {
-      if (isExperienceScrolledDown()) {
-        e.preventDefault();
-        touchActive = false;
-        touchAccum = 0;
-        scrollExpToTop(() => snapToHero());
-        return;
-      } else if (isAtExperienceTop()) {
-        e.preventDefault();
-        touchActive = false;
-        touchAccum = 0;
-        snapToHero();
-        return;
-      }
-    }
   }, { passive: false });
 
-  document.addEventListener('touchend', () => {
+  hero.addEventListener('touchend', () => {
     touchActive = false;
     touchAccum = 0;
   }, { passive: true });
 
-  // KEYBOARD
+  // optional: keep arrow/pgdown keyboard behavior only when a large portion of hero is still visible
+  // (but do NOT snap the timeline back to hero)
   document.addEventListener('keydown', (e) => {
     if (lock) return;
-    const k = e.key;
     const downKeys = ['ArrowDown', 'PageDown', ' '];
-    const upKeys = ['ArrowUp', 'PageUp'];
-    if (downKeys.includes(k) && isMostlyInHero()) {
+    // only trigger keyboard snap when a big chunk of hero is visible
+    const hr = hero.getBoundingClientRect();
+    const mostlyHero = hr.bottom > window.innerHeight * 0.35;
+    if (downKeys.includes(e.key) && mostlyHero) {
       e.preventDefault();
       snapToExperience();
-    } else if (upKeys.includes(k)) {
-      if (isExperienceScrolledDown()) {
-        e.preventDefault();
-        scrollExpToTop(() => snapToHero());
-      } else if (isAtExperienceTop()) {
-        e.preventDefault();
-        snapToHero();
-      }
     }
   });
 
-  // Optional debug helper:
-  // window._snap_state = () => ({ hero: heroRect(), exp: expRect(), header: headerHeight(), mostlyHero: isMostlyInHero(), atExpTop: isAtExperienceTop(), expScrolled: isExperienceScrolledDown(), pendingChain });
 })();
 </script>
+
 
 </body>
 
