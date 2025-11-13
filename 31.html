@@ -628,6 +628,35 @@
                 font-size: 2rem;
             }
         }
+       /* Target devices with screen size 412x915 pixels (portrait mode) */
+@media only screen 
+  and (device-width: 412px) 
+  and (device-height: 915px) 
+  and (orientation: portrait) {
+    .hero-section {
+        height: 200px;
+        /* margin-top: 65px; */
+        padding: 10px 20px 20px;
+    }
+    .logo-strip{
+        margin-bottom: 10px;
+    }
+  
+    .avatar {
+        margin-top: 0px !important;
+        width: 200px;
+        height: 220px;
+    }
+  /* Your custom CSS for this device */
+  h1 {
+    font-size: 2.5rem; /* example */
+    margin-bottom: 10px;
+  }
+  p{
+    font-size: 25px; /* example */
+     margin-bottom: 10px;
+  }
+}
     </style>
 </head>
 
